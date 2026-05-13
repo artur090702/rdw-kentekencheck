@@ -1,5 +1,5 @@
 {
-  "name": "occasionadviseur",
+  "name": "rdw-kentekencheck",
   "version": "1.0.0",
   "description": "Occasion rdw check uitgebreid",
   "license": "ISC",
@@ -7,7 +7,8 @@
   "type": "commonjs",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test",
+    "start": "node main.js"
   },
   "dependencies": {
     "ejs": "^3.1.10",

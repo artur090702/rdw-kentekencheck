@@ -1,4 +1,5 @@
 const rdw = require('./rdw/rdw');
+const { normalizeLicensePlate } = require('./rdw/utils');
 const express = require('express');
 
 const app = express();
@@ -9,9 +10,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/kentekencheck', (req, res, next) => {
-  const licenseplate = (req.query.licenseplate || '').toUpperCase().replaceAll('-', '');
+  const licenseplate = normalizeLicensePlate(req.query.licenseplate);
   rdw.fetchLicenseplate(licenseplate)
-    .then((data) => res.render('pages/kentekencheck', { data }))
+    .then(data => res.render('pages/kentekencheck', { data }))
     .catch(next);
 });
 

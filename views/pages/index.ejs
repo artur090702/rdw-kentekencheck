@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body>
+
+    <header>
+      <%- include('../partials/header'); %>
+    </header>
+
+    <main>
+      <div class="container">
+        <div class="hero">
+          <h1>Kenteken Check</h1>
+          <p class="hero-sub">
+            Controleer de geschiedenis van een Nederlandse auto —
+            NAP, APK-status, kilometerstanden en meer.
+          </p>
+          <form action="/kentekencheck" id="licenseplate-form">
+            <input type="text"
+                   id="licenseplate"
+                   name="licenseplate"
+                   placeholder="12-XX-34"
+                   oninput="validateInput(event)"
+                   maxlength="8"
+                   required
+                   autocomplete="off">
+            <input class="submit" type="submit" value="Zoek">
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <%- include('../partials/footer'); %>
+    </footer>
+
+  </body>
+</html>

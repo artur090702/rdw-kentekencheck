@@ -1,0 +1,23 @@
+<div class="footer-content">
+  <p>&copy; 2025 Artur Kuznetsou</p>
+  <ul class="contact-info">
+    <li><i class="footer-icon fas fa-envelope"></i> artur090702@gmail.com</li>
+    <li><i class="footer-icon fas fa-phone"></i> +31 6 15500583</li>
+  </ul>
+</div>
+
+<div id="loading-indicator">
+  <div class="spinner"></div>
+  Laden...
+</div>
+
+<script>
+  document.getElementById('licenseplate-form').addEventListener('submit', () => {
+    document.getElementById('loading-indicator').style.display = 'flex';
+  });
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      document.getElementById('loading-indicator').style.display = 'none';
+    }
+  });
+</script>

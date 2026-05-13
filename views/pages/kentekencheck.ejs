@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body>
+
+    <header>
+      <%- include('../partials/header'); %>
+    </header>
+
+  <main>
+    <div class="container">
+    <div class="jumbotron">
+      <div class="page-header">
+        <h1><%= `${data[0].merk} ${data[0].handelsbenaming}` %></h1>
+        <form action="/kentekencheck" id="licenseplate-form">
+          <input type="text"
+                 id="licenseplate"
+                 name="licenseplate"
+                 placeholder="<%= data[0].kenteken %>"
+                 oninput="validateInput(event)"
+                 maxlength="8"
+                 required
+                 autocomplete="off">
+          <input class="submit" type="submit" value="Zoek">
+        </form>
+      </div>
+
+      <br>
+
+
+      <div id="bad"></div>
+      <div id="warning"></div>
+
+      <% if(data.site_info.statusGroep.geexporteerd === "N") {%>
+      <h2 class="good"> <i class="fa fa-check" aria-hidden="true"></i> Dit voertuig is niet aangemeld als geëxporteerd. </h2>
+      <% } else { %>
+      <div class="bad-container">
+        <h2 class="bad"> <i class="fa-solid fa-x"></i> Dit voertuig is aangemeld als geëxporteerd. </h2>
+      </div>
+      <% } %>
+
+      <% if(data.site_info.statusGroep.tenaamstellingToegestaan === "J") {%>
+      <h2 class="good"> <i class="fa fa-check" aria-hidden="true"></i> Voor dit voertuig is tenaamstelling mogelijk </h2>
+      <% } else { %>
+      <div class="bad-container">
+        <h2 class="bad"> <i class="fa-solid fa-x"></i> Dit voertuig kan niet tenaamgesteld worden. </h2>
+      </div>
+      <% } %>
+      <details>
+        <summary><b>Toelichting</b></summary>
+        Wanneer een voertuig niet tenaamgesteld kan worden,
+        is er iets dat verhindert dat het voertuig op naam van een nieuwe eigenaar kan worden gezet.
+        Dit kan bijvoorbeeld het geval zijn in de volgende situaties:
+
+        <ul>
+          <li> <b> Openstaande boetes of schulden:</b> Als er nog openstaande boetes of schulden zijn die niet zijn voldaan,
+            kan het voertuig tijdelijk de status krijgen dat tenaamstellen niet mogelijk is.</li>
+
+          <li> <b>Verlies of schade van het kentekenbewijs:</b> Als het originele kentekenbewijs verloren of beschadigd is
+            en de eigenaar geen vervangend kentekenbewijs heeft aangevraagd, kan het voertuig niet worden overgeschreven.</li>
+
+          <li> <b>Voertuig is geschorst:</b> Als het voertuig geschorst is en dus tijdelijk niet verzekerd is,
+            kan het niet op naam van een nieuwe eigenaar worden gezet.</li>
+
+          <li> <b>Vervallen APK of keuring:</b> Als het voertuig niet is goedgekeurd voor de jaarlijkse APK-keuring
+            of de keuring van een importvoertuig, kan dit ook leiden tot een blokkade voor tenaamstelling.</li>
+
+          <li> <b>Verlies van het voertuig door schade of diefstal:</b> Wanneer het voertuig niet meer bestaat
+            (bijvoorbeeld na een ongeluk of diefstal),
+            kan de RDW het voertuig de status "geen tenaamstellen mogelijk" geven totdat het probleem is opgelost.</li>
+
+          <li> <b>Beperkingen door de rechter:</b> In sommige gevallen kan een rechter een voertuig in beslag laten nemen,
+            wat ook leidt tot de status "geen tenaamstellen mogelijk".</li>
+      </details>
+
+      <% if(data.site_info.statusGroep.tenaamstellingMogelijk === "J") {%>
+      <div class="bad-container">
+        <h2 class="bad"> <i class="fa-solid fa-x"></i> Dit voertuig staat geregistreerd als gestolen </h2>
+      </div>
+      <% } else { %>
+      <h2 class="good"> <i class="fa fa-check" aria-hidden="true"></i> Dit voertuig staat niet geregistreerd als gestolen </h2>
+      <% } %>
+
+          <% switch (data[0].tellerstandoordeel.toLowerCase()) {
+
+           case 'logisch' : %>
+           <div class="good-container">
+             <h2 class="good">
+               <i class="fa fa-check" aria-hidden="true"></i> Tellerstand oordeel NAP: <%= data[0].tellerstandoordeel %>
+             </h2>
+             <p>
+             De geregistreerde tellerstand is steeds
+             hoger dan de daarvoor geregistreerde tellerstand.
+             </p>
+             <% break;
+
+           case 'geen oordeel' : %>
+           <div class="warning-container">
+             <h2 class="warning">
+               <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Tellerstand oordeel NAP: <%= data[0].tellerstandoordeel %>
+             </h2>
+             <p>
+             "Geen oordeel" betekent dat er onvoldoende gegevens beschikbaar zijn om de kilometerstand van de auto te verifiëren,
+             bijvoorbeeld door gebrek aan registraties of onvolledige informatie.
+             Meestal komt dit doordat het voertuig in het buitenland geregistreerd was.
+             <br>
+             In ieder geval betekent "Geen oordeel" dat je als koper extra voorzichtig moet zijn bij het controleren van de
+             kilometerstand en wellicht andere bronnen moet raadplegen om meer informatie te verkrijgen over de staat van de auto.
+             </p>
+
+             <% break;
+
+           case 'onlogisch' : %>
+           <div class="bad-container">
+             <h2 class="bad">
+               <i class="fa-solid fa-x"></i> Tellerstand oordeel: <%= data[0].tellerstandoordeel %>
+             </h2>
+             <p>
+             In de reeks kilometerstanden is een stand geregistreerd
+             die lager is dan de stand daarvoor. Het kan zijn dat de
+             kilometerteller is teruggedraaid of dat er een typfout is gemaakt.
+             </p>
+             <% break;
+
+            default : %>
+           <div class="warning-container">
+            <h2 class="warning">
+              <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Tellerstand oordeel niet gevonden
+            </h2>
+            <% break;
+
+            } %>
+            <details>
+              <summary> <b> Toelichting </b></summary>
+              Deze auto, die deelneemt aan het NAP-systeem, heeft een geregistreerde kilometerstand
+              bij verschillende momenten, bijvoorbeeld bij de APK-keuring, onderhoudsbeurten
+              of andere belangrijke momenten. Dit helpt om de waarde en
+              betrouwbaarheid van een auto te bepalen en frauduleuze praktijken te voorkomen.
+              Als bij elke keuring de genoteerde kilometerstand hoger is dan de vorige, krijgt de auto de status "Logisch".
+              Dat betekent dat de kilometerstand van dit voertuig hoogstwaarschijnlijk niet is teruggedraaid.
+              <br>
+              Krijgt de auto de status "Geen oordeel"? Dan kon de volledige geschiedenis van de auto niet worden achterhaald.
+              <br>
+              Status "Onlogisch" betekent dat er op zijn minst één keer een lagere kilometerstand is geregistreerd dan de vorige.
+            </details>
+         <br>
+
+         <%
+         var today = new Date();
+         var vervalDatum = new Date(data[0].vervaldatum_apk_dt);
+         var difference = vervalDatum - today;
+         var millisecondsToMonths = 2.6298e+9;
+         var millisecondsToDays = 8.64e+7;
+         var modulo = difference % 2.6298e+9;
+         var days = Math.floor(modulo / millisecondsToDays);
+         var months = Math.floor((difference -  modulo) / millisecondsToMonths);
+
+         if (months < 1 && days < 0) {%>
+         <div class="bad-container">
+           <h2 class="bad">
+             <i class="fa-solid fa-x"></i> Deze auto heeft geen APK! De APK is <%=-months %> maanden en <%=-days %> dagen geleden verlopen.
+           </h2>
+         </div>
+         <% } else if ( months < 6) {%>
+         <div class="warning-container">
+           <h2 class="warning">
+             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  Deze auto moet binnenkort (over <%=months %> maanden en <%=days %> dagen) gekeurd worden (APK).
+           </h2>
+         </div>
+         <% } else { %>
+         <h2 class="good">
+           <i class="fa fa-check" aria-hidden="true"></i> Deze auto heeft nog lang APK (<%=months %> maanden en <%=days %> dagen).
+         </h2>
+         <% } %>
+
+         <% if (data.apk_keuringen.size > 1) { %>
+         <div class="warning-container">
+           <h2 class="warning"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= data.apk_keuringen.size %> APK-keuringen gevonden met gebreken </h2>
+           <p>  <b> In het verleden heeft dit voertuig meerdere APK-keuringen gehad,
+             waarbij er mankementen zijn geconstateerd aan het voertuig. </b>
+           <br>
+           Grote reparaties die pas verricht worden bij de APK
+           (denk aan draagarmen, remmen, vloeistoflekkages, etc.),
+           kunnen duiden op een slecht onderhouden voertuig of onoplettende eigenaar.
+           <b> Let daarom ook extra goed op de onderhoudsboekjes van deze auto. </b>
+           Kleine reparaties zoals lampjes en afstellen van lichten zeggen niet veel,
+           dus let vooral op de grote reparaties.
+           </p>
+           <% } else { %>
+           <div class="good-container">
+             <h2 class="good"> <i class="fa fa-check" aria-hidden="true"></i>
+               <%= data.apk_keuringen.size %> APK-keuringen gevonden met gebreken
+             </h2>
+             <p> Dit voertuig heeft, in het verleden, weinig tot geen APK-keuringen gehad met afkeurpunten.
+             Dit is een teken van een goed onderhouden auto.
+             </p>
+             <% } %>
+
+             <details>
+               <% for(const [key, value] of data.apk_keuringen) {%>
+               <summary> Klik hier om alle gevonden rapporten te zien </summary>
+               <h3> <%= `${key.substring(0, 4)}-${key.substring(4, 6)}-${key.substring(6, 8)}, ${value.length} gebreken` %> </h3>
+               <ol>
+                 <% for(const gebrek of value) {%>
+                 <li> <%= gebrek.description.gebrek_omschrijving %> </li>
+                 <% } %>
+               </ol>
+               <% } %>
+             </details>
+           </div>
+
+           <% if (data.site_info.statusGroep.wachtOpKeuring === "N") { %>
+           <h2 class="good"> <i class="fa fa-check" aria-hidden="true"></i> Geen rijverbod op de openbare weg. </h2>
+           <% } else { %>
+           <div class="bad-container">
+             <h2 class="bad"> <i class="fa-solid fa-x"></i> Dit voertuig mag niet rijden op de openbare weg! </h2>
+             <p> Dit voertuig mag niet meer rijden op de openbare weg.
+             Een verbod wordt meestal opgelegd voor een van deze redenen:
+             <ul>
+               <li> Geregistreerde heeft zijn voertuig ondanks een oproep van de RDW niet laten keuren. </li>
+               <li> Het voertuig is dusdanig gewijzigd dat de RDW die wijzigingen eerst moet goedkeuren. </li>
+               <li> Het voertuig voldoet niet aan de permanente eisen. </li>
+               <li> Het voertuig heeft schade. </li>
+             </ul>
+           </p>
+           </div>
+
+           <% } %>
+           <%
+           var aantalEigenaren = Number(data.site_info.aansprakelijkheidGroep.aantalEigenarenPrive) + Number(data.site_info.aansprakelijkheidGroep.aantalEigenarenZakelijk)
+           if (aantalEigenaren > 3) {
+           %>
+           <div class="warning-container">
+             <h2 class="warning"> <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  Dit voertuig heeft <%=aantalEigenaren%> eigenaren gehad </h2>
+             <p>
+             Het aantal eigenaren van deze auto is aan de hogere kant. <br>
+             Een groot aantal eigenaren voor een voertuig kan een slecht teken zijn om verschillende redenen:
+
+             <details>
+               <summary> <b> Klik hier om meer te lezen </b> </summary>
+               <ul>
+                 <li>
+                   <b> Problemen met betrouwbaarheid: </b>
+                   Als een voertuig vaak van eigenaar verandert,
+                   kan dat wijzen op herhaalde problemen met de betrouwbaarheid of de
+                   staat van het voertuig. De vorige eigenaren kunnen
+                   het voertuig hebben verkocht omdat ze regelmatig onderhoud of reparaties moesten uitvoeren.
+                 </li>
+
+                 <li>
+                   <b> Mogelijke onduidelijkheid over de geschiedenis: </b>
+                   Een voertuig met veel eigenaren kan een ingewikkelde geschiedenis hebben,
+                   wat het moeilijk maakt om te achterhalen of het goed is onderhouden.
+                 </li>
+
+                 <li>
+                   <b> Minder waarschijnlijk goed onderhouden: </b>
+                   Als een voertuig veel eigenaren heeft gehad,
+                   is de kans groter dat het niet goed onderhouden is, omdat niet elke eigenaar misschien de
+                   tijd of middelen heeft gehad om het voertuig goed te verzorgen.
+                   Dit kan zich uiten in slijtage of verborgen defecten.
+                 </li>
+               </ul>
+             </details>
+           </div>
+
+             </p>
+             <% } else { %>
+             <h2 class="good"> <i class="fa fa-check" aria-hidden="true"></i> Dit voertuig heeft slechts <%=aantalEigenaren%> eigenaar(en) gehad </h2>
+             <% } %>
+
+             <%
+               var brandstofTabel = data.site_info.motorTabel[0].brandstofTabel[0];
+               if (brandstofTabel.brandstof === "Diesel" && Number(brandstofTabel.emissiecode) < 5) {%>
+               <div class="warning-container">
+                 <h2 class="warning">
+                   <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  Dit is een dieselauto met emissiecode <%=brandstofTabel.emissiecode%>.
+                   Hierdoor mag je niet alle gemeenten meer binnenrijden.
+                 </h2>
+               </div>
+
+               <% } else if (brandstofTabel.brandstof === "Diesel" && Number(brandstofTabel.emissiecode) == 5) { %>
+               <div class="warning-container">
+                 <h2 class="warning">
+                   <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Dit is een dieselauto met emissiecode <%=brandstofTabel.emissiecode%>.
+                   Sommige gemeenten mag je daardoor over een aantal jaar niet meer binnenrijden.
+                 </h2>
+               </div>
+
+               <% } else if (brandstofTabel.brandstof === "Diesel" && Number(brandstofTabel.emissiecode) > 5) { %>
+               <h2 class="good">
+                 <i class="fa fa-check" aria-hidden="true"></i> Dit is een dieselauto met emissiecode <%=brandstofTabel.emissiecode%>.
+                 Je mag de komende jaren alle gemeenten binnenrijden.
+               </h2>
+
+               <% } else { %>
+               <h2 class="good"><i class="fa fa-check" aria-hidden="true"></i> Dit voertuig is geen diesel. Je mag voorlopig alle milieuzones in. </h2>
+               <% } %>
+               <div class="section-heading">Alle informatie</div>
+               <details>
+                 <summary> Klik hier om alle informatie uit te klappen </summary>
+                 <%
+                 function prettify(str) {
+                    str = str.replace("Tabel", "").replace("Groep", "");
+                    return str.replace(/([A-Z])/g, ' $1').replace(/^./, function(char) {
+                       return char.toUpperCase();
+                    });
+                 }
+                 function displayObject(obj) {
+                   for(let key in obj){
+                     if (obj[key] == null) {
+                       continue;
+                     }
+                     if (typeof obj[key] === 'object') {
+                           if( key != 0 && key != 1) { %>
+                          <h2> <%=prettify(key) %> </h2>
+                          <% }
+                          displayObject(obj[key]);
+                     } else { %>
+                     <%= `${prettify(key)}: ${obj[key]}` %> <br>
+                     <%
+                        }
+                      }
+                   }
+                  displayObject(data.site_info);
+                  %>
+               </details>
+         </div>
+    </div>
+    </div>
+  </main>
+
+    <script>
+      document.querySelectorAll('.bad-container').forEach(el => {
+        document.getElementById('bad').appendChild(el);
+      });
+      document.querySelectorAll('.warning-container').forEach(el => {
+        document.getElementById('warning').appendChild(el);
+      });
+    </script>
+
+    <footer>
+      <%- include('../partials/footer'); %>
+    </footer>
+
+  </body>
+</html>

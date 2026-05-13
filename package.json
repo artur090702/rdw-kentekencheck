@@ -1,0 +1,18 @@
+{
+  "name": "occasionadviseur",
+  "version": "1.0.0",
+  "description": "Occasion rdw check uitgebreid",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "node-cron": "^3.0.3",
+    "puppeteer": "^24.4.0"
+  }
+}

@@ -1,0 +1,24 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --tag=$_IMAGE_NAME:$COMMIT_SHA
+      - --tag=$_IMAGE_NAME:latest
+      - --cache-from=$_IMAGE_NAME:latest
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - --all-tags
+      - $_IMAGE_NAME
+
+images:
+  - $_IMAGE_NAME:$COMMIT_SHA
+  - $_IMAGE_NAME:latest
+
+substitutions:
+  _IMAGE_NAME: europe-west4-docker.pkg.dev/$PROJECT_ID/rdw-kentekencheck/rdw-kentekencheck
+
+options:
+  logging: CLOUD_LOGGING_ONLY

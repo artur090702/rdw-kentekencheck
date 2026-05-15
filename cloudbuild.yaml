@@ -17,8 +17,5 @@ images:
   - $_IMAGE_NAME:$COMMIT_SHA
   - $_IMAGE_NAME:latest
 
-substitutions:
-  _IMAGE_NAME: europe-west4-docker.pkg.dev/$PROJECT_ID/rdw-kentekencheck/rdw-kentekencheck
-
 options:
   logging: CLOUD_LOGGING_ONLY

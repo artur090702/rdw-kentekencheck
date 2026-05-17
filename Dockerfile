@@ -40,6 +40,7 @@ WORKDIR /app
 
 COPY package*.json ./
 RUN npm ci --omit=dev
+RUN npx puppeteer browsers install chrome
 
 COPY . .
 

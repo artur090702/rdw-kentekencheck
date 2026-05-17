@@ -73,6 +73,7 @@
 
           <li> <b>Beperkingen door de rechter:</b> In sommige gevallen kan een rechter een voertuig in beslag laten nemen,
             wat ook leidt tot de status "geen tenaamstellen mogelijk".</li>
+      </ul>
       </details>
 
       <% if(data.site_info.statusGroep.tenaamstellingMogelijk === "J") {%>
@@ -148,14 +149,14 @@
          <br>
 
          <%
-         var today = new Date();
-         var vervalDatum = new Date(data[0].vervaldatum_apk_dt);
-         var difference = vervalDatum - today;
-         var millisecondsToMonths = 2.6298e+9;
-         var millisecondsToDays = 8.64e+7;
-         var modulo = difference % 2.6298e+9;
-         var days = Math.floor(modulo / millisecondsToDays);
-         var months = Math.floor((difference -  modulo) / millisecondsToMonths);
+         const today = new Date();
+         const vervalDatum = new Date(data[0].vervaldatum_apk_dt);
+         const difference = vervalDatum - today;
+         const millisecondsToMonths = 2.6298e+9;
+         const millisecondsToDays = 8.64e+7;
+         const modulo = difference % millisecondsToMonths;
+         const days = Math.floor(modulo / millisecondsToDays);
+         const months = Math.floor((difference - modulo) / millisecondsToMonths);
 
          if (months < 1 && days < 0) {%>
          <div class="bad-container">
@@ -199,12 +200,12 @@
              <% } %>
 
              <details>
-               <% for(const [key, value] of data.apk_keuringen) {%>
                <summary> Klik hier om alle gevonden rapporten te zien </summary>
+               <% for(const [key, value] of data.apk_keuringen) {%>
                <h3> <%= `${key.substring(0, 4)}-${key.substring(4, 6)}-${key.substring(6, 8)}, ${value.length} gebreken` %> </h3>
                <ol>
                  <% for(const gebrek of value) {%>
-                 <li> <%= gebrek.description.gebrek_omschrijving %> </li>
+                 <li> <%= gebrek.description?.gebrek_omschrijving %> </li>
                  <% } %>
                </ol>
                <% } %>
@@ -229,7 +230,7 @@
 
            <% } %>
            <%
-           var aantalEigenaren = Number(data.site_info.aansprakelijkheidGroep.aantalEigenarenPrive) + Number(data.site_info.aansprakelijkheidGroep.aantalEigenarenZakelijk)
+           const aantalEigenaren = Number(data.site_info.aansprakelijkheidGroep.aantalEigenarenPrive) + Number(data.site_info.aansprakelijkheidGroep.aantalEigenarenZakelijk)
            if (aantalEigenaren > 3) {
            %>
            <div class="warning-container">
@@ -272,7 +273,7 @@
              <% } %>
 
              <%
-               var brandstofTabel = data.site_info.motorTabel[0].brandstofTabel[0];
+               const brandstofTabel = data.site_info.motorTabel[0].brandstofTabel[0];
                if (brandstofTabel.brandstof === "Diesel" && Number(brandstofTabel.emissiecode) < 5) {%>
                <div class="warning-container">
                  <h2 class="warning">
@@ -309,12 +310,12 @@
                     });
                  }
                  function displayObject(obj) {
-                   for(let key in obj){
+                   for (const key of Object.keys(obj)) {
                      if (obj[key] == null) {
                        continue;
                      }
                      if (typeof obj[key] === 'object') {
-                           if( key != 0 && key != 1) { %>
+                           if (key !== '0' && key !== '1') { %>
                           <h2> <%=prettify(key) %> </h2>
                           <% }
                           displayObject(obj[key]);

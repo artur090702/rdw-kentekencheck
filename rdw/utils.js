@@ -110,11 +110,11 @@ const queryAPK = `SELECT \`kenteken\`,
   WHERE caseless_one_of(\`kenteken\`, "%s")`;
 
 function generateVehicleURL(licenseplate) {
-  return urlVehicle + encodeURI(queryVehicle.replace('%s', licenseplate));
+  return urlVehicle + encodeURIComponent(queryVehicle.replace('%s', licenseplate));
 }
 
 function generateAPKURL(licenseplate) {
-  return urlAPK + encodeURI(queryAPK.replace('%s', licenseplate));
+  return urlAPK + encodeURIComponent(queryAPK.replace('%s', licenseplate));
 }
 
 function groupAPKByDate(apkInfo, gebreken) {

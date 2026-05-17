@@ -1,21 +1,19 @@
 const puppeteer = require('puppeteer');
 
-let initialized = false;
+let initPromise = null;
 let scrapedHeaders;
 
-async function init(licenseplate) {
-  if (initialized) return;
-
+async function doInit(licenseplate) {
   console.log('getting RDW headers');
-const browser = await puppeteer.launch({
-  headless: 'new',
-  args: [
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-    '--disable-dev-shm-usage',
-    '--disable-gpu'
-  ]
-});
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+    ],
+  });
   try {
     const page = await browser.newPage();
     page.on('request', req => {
@@ -39,11 +37,20 @@ const browser = await puppeteer.launch({
   }
 
   console.log('got RDW headers');
-  initialized = true;
   setTimeout(() => {
     console.info('rerunning init function on next request');
-    initialized = false;
+    initPromise = null;
   }, 1000 * 60 * 60);
+}
+
+async function init(licenseplate) {
+  if (!initPromise) {
+    initPromise = doInit(licenseplate).catch(err => {
+      initPromise = null;
+      throw err;
+    });
+  }
+  return initPromise;
 }
 
 function buildRequest(licenseplate) {
@@ -69,7 +76,7 @@ async function scrapeLicenseplate(licenseplate) {
     const resp = await fetch(buildRequest(licenseplate));
     return await resp.json();
   } catch {
-    initialized = false;
+    initPromise = null;
     await init(licenseplate);
     const resp = await fetch(buildRequest(licenseplate));
     return await resp.json();

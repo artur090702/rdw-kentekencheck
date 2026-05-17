@@ -19,12 +19,14 @@ app.get('/kentekencheck', (req, res, next) => {
 app.use((err, req, res, next) => {
   console.error(err);
   if (req.query.licenseplate) {
+    const safe = normalizeLicensePlate(req.query.licenseplate);
     return res.status(500).send(
-      `Kenteken check voor kenteken <b>${req.query.licenseplate}</b> is mislukt. Controleer kenteken of neem contact op (+31 6 15500583/artur090702@gmail.com)`
+      `Kenteken check voor kenteken <b>${safe}</b> is mislukt. Controleer kenteken of neem contact op (+31 6 15500583/artur090702@gmail.com)`
     );
   }
   res.status(500).send('Er is iets mis gegaan. Neem contact op. (+31 6 15500583/artur090702@gmail.com)');
 });
 
-app.listen(8080);
-console.info('Server is listening on port 8080');
+const port = process.env.PORT || 8080;
+app.listen(port);
+console.info(`Server is listening on port ${port}`);

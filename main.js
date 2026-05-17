@@ -20,10 +20,10 @@ app.use((err, req, res, next) => {
   console.error(err);
   if (req.query.licenseplate) {
     return res.status(500).send(
-      `Kenteken check voor kenteken <b>${req.query.licenseplate}</b> is mislukt. Controleer kenteken of neem contact op (+31 6 15500583)`
+      `Kenteken check voor kenteken <b>${req.query.licenseplate}</b> is mislukt. Controleer kenteken of neem contact op (+31 6 15500583/artur090702@gmail.com)`
     );
   }
-  res.status(500).send('Er is iets mis gegaan. Neem contact op. (+31 6 15500583)');
+  res.status(500).send('Er is iets mis gegaan. Neem contact op. (+31 6 15500583/artur090702@gmail.com)');
 });
 
 app.listen(8080);

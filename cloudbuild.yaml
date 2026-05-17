@@ -16,6 +16,7 @@ steps:
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: Get Credentials
+    entrypoint: gcloud
     args:
       - container
       - clusters

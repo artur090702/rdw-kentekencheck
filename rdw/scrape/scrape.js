@@ -7,7 +7,15 @@ async function init(licenseplate) {
   if (initialized) return;
 
   console.log('getting RDW headers');
-  const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+const browser = await puppeteer.launch({
+  headless: 'new',
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu'
+  ]
+});
   try {
     const page = await browser.newPage();
     page.on('request', req => {

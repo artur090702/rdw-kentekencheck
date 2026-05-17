@@ -15,13 +15,24 @@ steps:
       - $_IMAGE_NAME
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: Get Credentials
+    args:
+      - container
+      - clusters
+      - get-credentials
+      - $_CLUSTER_NAME
+      - --zone=$_CLUSTER_ZONE
+      - --project=$PROJECT_ID
+    waitFor: ['Docker Push']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: Rollout Restart
     entrypoint: kubectl
     args:
       - rollout
       - restart
       - deployment/rdw-kentekencheck
-    waitFor: ['Docker Push']
+    waitFor: ['Get Credentials']
 
 images:
   - $_IMAGE_NAME:$COMMIT_SHA
